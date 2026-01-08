@@ -41,10 +41,10 @@ buildNpmPackage rec {
 
   nativeBuildInputs = [
     pkg-config
+    makeWrapper
   ]
   ++ lib.optional stdenv.isDarwin clang_20 # clang_21 breaks gyp builds
   ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [
-    makeWrapper
     copyDesktopItems
   ];
 
@@ -178,6 +178,10 @@ buildNpmPackage rec {
     }
 
     runHook postInstall
+  '';
+
+  postInstall = lib.optionalString stdenv.hostPlatform.isDarwin ''
+    makeWrapper $out/Applications/Bruno.app/Contents/MacOS/Bruno $out/bin/bruno
   '';
 
   passthru.updateScript = nix-update-script { };
